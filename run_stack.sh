@@ -39,3 +39,15 @@ else
 fi
 
 echo -e "${GREEN}=== All Core Systems Executed and Verified Successfully ===${NC}"
+
+# Step 3: Execute DMV Data Pipeline Simulation
+echo -e "${YELLOW}[Step 3/3] Launching DMV Secure Medical Pipeline Simulator...${NC}"
+if [ -f "CAMPAIGN_OPS/simulate_dmv_pipeline.py" ]; then
+    python3 CAMPAIGN_OPS/simulate_dmv_pipeline.py
+else
+    echo -e "[-] Error: simulate_dmv_pipeline.py missing from CAMPAIGN_OPS."
+    exit 1
+fi
+
+echo -e "\n${GREEN}=== All Core Systems Executed and Verified Successfully ===${NC}"
+
