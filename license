@@ -40,3 +40,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## ⚖️ Intellectual Property & Original Authorship Notice
+
+The core software logic, database architecture schemas, and mathematical policy modeling contained within this repository—specifically including the **Secure Physician-to-DMV Vision Pipeline API Simulation** and the **AHEAD Regional Actuarial Budgeting Engine**—represent original civic engineering frameworks developed by **usginger (The People's Congress)**.
+
+### Attribution Requirements
+While this project is proudly open-source under the MIT License, any political campaign, civic technology group, or independent developer forking, copying, or adapting these proprietary scripts and structural models **MUST** maintain visible and explicit attribution to the original repository:
+`https://github.com`
+
+Unauthorized stripping of attribution headers from the `voter_analytics.py`, `simulate_dmv_pipeline.py`, or `validate_budget.py` engines constitutes a violation of the open-source licensing terms.
+
