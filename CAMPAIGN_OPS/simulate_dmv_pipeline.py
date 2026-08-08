@@ -1,3 +1,19 @@
+# ==============================================================================
+# COPYRIGHT NOTICE & INTELLECTUAL PROPERTY RIGHTS
+# ==============================================================================
+# Project: The People's Congress Civic Tech Framework
+# Asset: Operational Data & Automation Engine
+# Author: usginger (https://github.com)
+# Year: 2026
+# License: MIT License (See root LICENSE file for full legal terms)
+#
+# TERMS OF USE:
+# This module is free and open-source. You may modify, fork, and distribute it
+# provided that this original copyright block and repository attribution link
+# remain completely intact at the top of the file source.
+# ==============================================================================
+
+
 #!/usr/bin/env python3
 import json
 import secrets
