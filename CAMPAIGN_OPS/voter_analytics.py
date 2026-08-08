@@ -1,94 +1,95 @@
-# -*- coding: utf-8 -*-
-"""
-CAMPAIGN_OPS/voter_analytics.py
-Part of 'The People's Congress' open-source campaign infrastructure.
-
-This script parses a standardized public voter registration file (.csv) 
-to isolate and score high-priority precincts based on two factors:
-1. Historical turnout trends.
-2. Proximity to systemic infrastructure bottlenecks (e.g., rural healthcare deficits or long DMV wait lines).
-
-Usage:
-    python voter_analytics.py --input voter_file.csv --output priority_precincts.csv
-"""
-
+#!/usr/bin/env python3
 import os
-import argparse
-import pandas as pd
+import csv
+import json
 
-def load_voter_data(file_path):
-    """Loads voter registration data from a CSV file."""
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Input file not found at: {file_path}")
-    print(f"[*] Reading voter database from {file_path}...")
-    return pd.read_csv(file_path)
+def load_precinct_data(csv_path):
+    """Loads raw precinct turnout histories from the campaign data directory."""
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"[-] Missing precinct database file: {csv_path}")
+        
+    precincts = []
+    with open(csv_path, mode='r', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            precincts.append({
+                "precinct_id": row["precinct_id"],
+                "county": row["county"],
+                "registered_voters": int(row["registered_voters"]),
+                "historical_turnout_2022": int(row["historical_turnout_2022"]),
+                "historical_turnout_2024": int(row["historical_turnout_2024"]),
+                "demographic_senior_pct": float(row["demographic_senior_pct"])
+            })
+    return precincts
 
-def score_precincts(df):
+def calculate_priority_scores(precincts, output_json_path):
     """
-    Aggregates data by precinct and applies an actionability score.
-    High score = High registration + low historic turnout (prime for grassroots push).
+    Parses turnouts, detects mobilization opportunities, and scores precincts.
+    Higher priority scores point to regions with high senior populations 
+    impacted by DMV/Health access issues but historically low turnouts.
     """
-    print("[*] Processing precinct aggregates and calculating priority metrics...")
+    targeted_outputs = []
     
-    # Ensure required columns exist, fill with baseline logic if simple schema
-    required_cols = ['precinct_id', 'voter_status', 'historic_turnout_score', 'rural_distance_miles']
-    for col in required_cols:
-        if col not in df.columns:
-            if col == 'voter_status': df[col] = 'Active'
-            elif col == 'historic_turnout_score': df[col] = 0.5
-            elif col == 'rural_distance_miles': df[col] = 5.0
-            else: df[col] = df.index
+    print(f"[+] Processing {len(precincts)} geographic precincts...")
+    print("-" * 65)
 
-    # Filter strictly to active registered voters
-    active_voters = df[df['voter_status'].str.lower() == 'active']
-
-    # Grouping data metrics by unique precinct ID
-    precinct_summary = active_voters.groupby('precinct_id').agg(
-        total_active_voters=('precinct_id', 'count'),
-        avg_historic_turnout=('historic_turnout_score', 'mean'),
-        miles_to_nearest_facility=('rural_distance_miles', 'mean')
-    ).reset_index()
-
-    # Core Algorithm: Prioritize areas with big active voter pools, low turnouts, and high infrastructure isolation
-    precinct_summary['organizing_priority_score'] = (
-        precinct_summary['total_active_voters'] * 
-        (1.0 - precinct_summary['avg_historic_turnout']) * 
-        (1.0 + (precinct_summary['miles_to_nearest_facility'] / 10.0))
-    ).round(2)
-
-    # Sort array by highest priority
-    sorted_precincts = precinct_summary.sort_values(by='organizing_priority_score', ascending=False)
-    return sorted_precincts
-
-def main():
-    parser = argparse.ArgumentParser(description="The People's Congress - Voter Data Analytics Tool")
-    parser.add_argument('--input', type=str, default='voter_data_sample.csv', help='Path to raw voter registration CSV')
-    parser.add_argument('--output', type=str, default='priority_precincts.csv', help='Path to save output priorities')
-    args = parser.parse_args()
-
-    # Self-generating sample data framework if user runs script naked to showcase system
-    if not os.path.exists(args.input) and args.input == 'voter_data_sample.csv':
-        print(f"[!] Input file {args.input} not found. Generating sample data for demonstration...")
-        mock_data = pd.DataFrame({
-            'voter_id': [f"VOTER_{i:04d}" for i in range(1, 201)],
-            'precinct_id': [f"Precinct_{i}" for i in [1, 2, 3, 4] * 50],
-            'voter_status': ['Active'] * 180 + ['Inactive'] * 20,
-            'historic_turnout_score': [0.3, 0.7, 0.4, 0.8] * 50, 
-            'rural_distance_miles': [18.5, 2.1, 14.0, 4.3] * 50 
+    for p in precincts:
+        # Calculate historical baseline turnout averages
+        avg_turnout_vol = (p["historical_turnout_2022"] + p["historical_turnout_2024"]) / 2
+        turnout_rate = avg_turnout_vol / p["registered_voters"]
+        
+        # Core Analytics Logic: Find high registration pools with weak participation
+        unrealized_voter_pool = p["registered_voters"] - avg_turnout_vol
+        
+        # Priority Multiplier: Weigh heavier in areas with high density of seniors (DMV / Health platform focus)
+        priority_score = round((unrealized_voter_pool * (p["demographic_senior_pct"] / 100.0)), 2)
+        
+        targeted_outputs.append({
+            "precinct_id": p["precinct_id"],
+            "county": p["county"],
+            "metrics": {
+                "turnout_rate_pct": round(turnout_rate * 100, 2),
+                "unrealized_voters_count": int(unrealized_voter_pool),
+                "senior_density_pct": p["demographic_senior_pct"]
+            },
+            "targeting": {
+                "priority_score": priority_score,
+                "tier": "TIER_1_URGENT" if priority_score > 500 else "TIER_2_STANDARD"
+            }
         })
-        mock_data.to_csv(args.input, index=False)
 
+    # Sort database entries by highest priority first
+    targeted_outputs.sort(key=lambda x: x["targeting"]["priority_score"], reverse=True)
+
+    # Save processed analytics ledger
+    with open(output_json_path, 'w', encoding='utf-8') as out_file:
+        json.dump(targeted_outputs, out_file, indent=2)
+        
+    return targeted_outputs
+
+def display_top_targets(scored_data, limit=3):
+    """Prints out top high-priority targets for volunteer deployments."""
+    print(f"[✔] Top {limit} High-Priority Campaign Targets Extracted:")
+    for idx, item in enumerate(scored_data[:limit], 1):
+        print(f" {idx}. Precinct: {item['precinct_id']} ({item['county']} County)")
+        print(f"    - Priority Score: {item['targeting']['priority_score']}")
+        print(f"    - Target Tier:    {item['targeting']['tier']}")
+        print(f"    - Senior Density: {item['metrics']['senior_density_pct']}%")
+        print(f"    - Unused Votes:   {item['metrics']['unrealized_voters_count']} voters")
+        print("-" * 65)
+
+if __name__ == "__main__":
+    # Relative repository execution pathing
+    input_csv = os.path.join("CAMPAIGN_OPS", "data", "voter_precincts_raw.csv")
+    output_json = os.path.join("CAMPAIGN_OPS", "data", "voter_priority_analytics.json")
+    
     try:
-        raw_data = load_voter_data(args.input)
-        priorities = score_precincts(raw_data)
-        
-        priorities.to_csv(args.output, index=False)
-        print(f"[+] Success! Priority targeting metrics saved to: {args.output}")
-        print("\n--- TOP PRIORITIES FOR GRASSROOTS FIELD OUTREACH ---")
-        print(priorities.head(5).to_string(index=False))
-        
+        raw_data = load_precinct_data(input_csv)
+        results = calculate_priority_scores(raw_data, output_json)
+        display_top_targets(results)
+        print(f"[+] Operational data ledger written safely to: {output_json}")
     except Exception as e:
-        print(f"[-] Operational Error: {e}")
+        print(f"[❌] Analytics Engine Error: {e}")
 
-if __name__ == '__main__':
-    main()
+
+   
