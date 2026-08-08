@@ -1,0 +1,47 @@
+{
+  "dataset_reference": "usginger-2018-longevity-study",
+  "data_module": "policy_engine_actuarial_modeling",
+  "formula_reference": "B_t = (Sum_p(Base_p * (1 + Delta_Pop + Delta_CMI))) + Floor_Rural + Kappa_Quality",
+  "fiscal_year": 2026,
+  "target_facility": {
+    "facility_id": "CAH-99214",
+    "name": "Merced Rural Critical Access Hospital",
+    "locale": "Merced, California, USA"
+  },
+  "formula_parameters": {
+    "historical_baseline_costs_base_p": [
+      {
+        "payer_channel": "Medicare FFS",
+        "historical_3yr_rolling_average_usd": 4200000.00
+      },
+      {
+        "payer_channel": "Medicaid Managed Care",
+        "historical_3yr_rolling_average_usd": 2800000.00
+      },
+      {
+        "payer_channel": "Commercial Insurers",
+        "historical_3yr_rolling_average_usd": 1500000.00
+      }
+    ],
+    "scaling_factors": {
+      "delta_pop": -0.012,
+      "delta_cmi": 0.035
+    },
+    "fixed_insulation": {
+      "floor_rural_usd": 1800000.00
+    },
+    "performance_modifiers": {
+      "kappa_quality_multiplier": 0.025,
+      "metrics": {
+        "preventable_30_day_readmission_rate_pct": 4.2,
+        "performance_bonus_earned_usd": 212500.00
+      }
+    }
+  },
+  "actuarial_output": {
+    "calculated_global_budget_bt_usd": 10738500.00,
+    "payment_distribution_schedule": "Quarterly Block Grants",
+    "disbursement_per_quarter_usd": 2684625.00,
+    "global_status": "CALCULATED_AND_VERIFIED"
+  }
+}
