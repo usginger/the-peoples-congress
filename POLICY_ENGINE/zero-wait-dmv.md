@@ -92,3 +92,26 @@ This integrated policy synthesizes operational strengths from CA, VA, and NC fra
 
 *   **Strict Opt-In Consensus:** Medical data is never transmitted automatically. Citizens must explicitly trigger the digital authorization waiver at the point of care or within their secure health portal.
 *   **Zero Medical Data Storage:** The DMV database does not ingest or store an applicant's broader medical background. It receives a binary `PASS / FAIL` validation token alongside specific visual acuity numbers ($20/40$ baseline markers) signed by a licensed provider's NPI (National Provider Identifier) number.
+
+*   ---
+
+## 🔬 Mathematical Architecture: The Global Budget Formula
+
+To prove to legislative fiscal analysts that this model is solvent, we replace arbitrary block grants with a rigid, predictable actuarial formula. The Annual Global Budget ($B_t$) for a designated Critical Access Hospital (CAH) is engineered using the following baseline:
+
+$$B_t = \left( \sum_{p} Base_{p} \times \left( 1 + \Delta Pop + \Delta CMI \right) \right) + Floor_{Rural} + \kappa_{Quality}$$
+
+### Formula Breakdown for Legislative Review:
+*   $Base_{p}$: The historical 3-year rolling average of total allowable costs across all participating payers ($p$ = Medicare, Medicaid, and Commercial Insurers).
+*   $\Delta Pop$: An annual demographic scaling factor adjusting for regional population contraction or aging trends.
+*   $\Delta CMI$: Case-Mix Index adjustment to account for shifting localized disease burdens (e.g., rising regional diabetes or heart disease rates).
+*   $Floor_{Rural}$: A guaranteed financial floor that ensures revenue never drops below the fixed overhead cost required to run the Emergency Department and basic imaging 24/7, completely independent of volume.
+*   $\kappa_{Quality}$: A performance bonus modifier (up to 2.5%) tied directly to reducing preventable 30-day hospital readmissions.
+
+---
+
+## 🗺️ State-Level Implementation Roadmap
+
+Transitioning a state’s rural health infrastructure cannot happen overnight. We propose a structured 3-Phase rollout over 36 months to prevent operational disruption:
+
+
