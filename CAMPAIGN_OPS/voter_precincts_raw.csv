@@ -1,0 +1,7 @@
+precinct_id,county,registered_voters,historical_turnout_2022,historical_turnout_2024,demographic_senior_pct
+PRECINCT_MERCED_01,Merced,1200,450,710,34.5
+PRECINCT_MERCED_02,Merced,1850,620,1100,28.2
+PRECINCT_ROANOKE_0A,Roanoke,950,380,590,41.8
+PRECINCT_ROANOKE_0B,Roanoke,2200,1150,1620,22.4
+PRECINCT_MCDOWELL_1,McDowell,800,290,480,48.6
+PRECINCT_MCDOWELL_2,McDowell,1400,510,890,39.1
